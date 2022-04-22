@@ -77,32 +77,6 @@ df = pd.DataFrame({
 lista_de_eventos = {}
 
 
-
-
-""" lista = {'10/04/22' : [{'titulo' : 'Prova faculdade', 'horario' : '16:45'}, 
-                        {'titulo' : None, 'horario' : None}], 
-
-        '11/04/22' : [{'titulo' : 'Prova faculdade 2', 'horario' : '15:00'}]
-        }
-        
-lista['11/04/22'].append('1')
-lista['11/04/22'].remove('1')
-
-lista.update({'12/04/22' : [{'titulo' : 'Prova faculdade 3', 'horario' : '12:00'}]
-                })
-
-lista['12/04/22'].append({'titulo' : 'Prova faculdade 4', 'horario' : '10:00'}) """
-
-
-#como adicionar novos eventos numa data especifica   
-#como excluir evento
-#ordernar por horário
-#armazenar 
-#n eventos
-
-# app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
-
-
 #container princiapal, em que tudo mostrado na página está dentro dele
 app.layout = dbc.Container([
 
@@ -170,7 +144,8 @@ app.layout = dbc.Container([
 
     #exibição da estrutura da tabela do calendário
     html.Div([
-        DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], id="calendar", 
+        DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], id="calendar",
+        active_cell = {'row': 3, 'column' : 4, 'column_id' : 'SEX', 'row_id' : 0},
         style_table={'borderRadius' : '20px',
                     'border': '2px solid #000000',
                     'height': '40rem',
@@ -249,16 +224,7 @@ app.layout = dbc.Container([
     html.Div(id='div-dia-semana-atual',
             style={'margin-left' : '802px',
             'margin-top' : '-510px', 
-            'width' : '105px',
-            'height' : '20px',
-            'color' : '#ffffff',
-            'text-align' : 'left'}
-        ),
-
-    html.Div(id='div-dia-mes-atual',
-            style={'margin-left' : '910px',
-            'margin-top' : '-20px', 
-            'width' : '40px',
+            'width' : '130px',
             'height' : '20px',
             'color' : '#ffffff',
             'text-align' : 'left'}
@@ -351,6 +317,7 @@ def render_calendar_content(botao_avanca, botao_volta, pathname):
             day = "SEG" if days_of_week.index(day) + 1 >= 7 else days_of_week[days_of_week.index(day) + 1]
             if day == "SEG": 
                 c += 1
+
         return empty_dict, meses[mm-1], anos[yy]
 
 
@@ -405,48 +372,10 @@ def update_lista_eventos(n_clicks, data_conc, horario, titulo, local, descricao)
 
     return lista_de_eventos, horario, titulo, local, descricao
 
-
-
-# @app.callback(
-#         [Output('div-dia-semana-atual', 'children'), 
-#         Output('div-dia-mes-atual', 'children')],
-
-#         Input('calendar', 'active_cell'),
-#         State('calendar', 'data'), 
-#         prevent_initial_call=True
-# )       
-# def update_data_atual(active_cell, df):
-
-#     if active_cell is None:
-#         return None, None
-
-#     col = active_cell['column_id']
-
-#     if col == 'SEG':
-#         col = 'Segunda-Feira,'
-#     elif col == 'TER':
-#         col = 'Terça-Feira,'
-#     elif col == 'QUA':
-#         col = 'Quarta-Feira,'
-#     elif col == 'QUI':
-#         col = 'Quinta-Feira,'
-#     elif col == 'SEX':
-#         col = 'Sexta-Feira,'
-#     elif col == 'SAB':
-#         col = 'Sábado,'
-#     elif col == 'DOM':
-#         col = 'Domingo,'
-
-#     data_atual = df[active_cell['row']][active_cell['column_id']]
-#     return col, data_atual
-
-
-
 @app.callback(
     [Output('div-data-concatenada', 'children'),
     Output('card-geral', 'children'),
-    # Output('div-dia-semana-atual', 'children'), 
-    # Output('div-dia-mes-atual', 'children')
+    Output('div-dia-semana-atual', 'children')
     ],
 
     [Input('calendar', 'active_cell'),
@@ -469,8 +398,28 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
     data_conc = '{:02d}/{:02d}/{:02d}'.format(dia, meses.index(str(mes)) + 1, ano)
 
     card_tarefa = []
-    # pdb.set_trace()
+
     num_events = 0 if data_conc not in lista_de_eventos.keys() else len(lista_de_eventos[data_conc])
+
+
+    col = active_cell['column_id']
+
+    if col == 'SEG':
+        col = 'Segunda-Feira'
+    elif col == 'TER':
+        col = 'Terça-Feira'
+    elif col == 'QUA':
+        col = 'Quarta-Feira'
+    elif col == 'QUI':
+        col = 'Quinta-Feira'
+    elif col == 'SEX':
+        col = 'Sexta-Feira'
+    elif col == 'SAB':
+        col = 'Sábado'
+    elif col == 'DOM':
+        col = 'Domingo'
+
+    data_extenso = col + ', ' + data_conc[:2]
 
 
     for i in range(num_events):
@@ -526,7 +475,7 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                 )
         card_tarefa.append(new_card)
 
-    return data_conc, card_tarefa
+    return data_conc, card_tarefa, data_extenso
 
 
 
