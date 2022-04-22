@@ -1,3 +1,4 @@
+from this import d
 from dash import Dash, Input, Output, dash_table, callback_context
 from dash import html, dcc
 import dash
@@ -290,13 +291,13 @@ def render_calendar_content(botao_avanca, botao_volta, pathname):
 
         changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
-        if 'avanca' in changed_id:
+        if 'avancar' in changed_id:
             mm += 1 
             if mm > 12:
                 mm = 1
                 yy += 1
 
-        elif 'volta' in changed_id:
+        elif 'voltar' in changed_id:
             mm -= 1 
             if mm < 1:
                 mm = 12
@@ -317,6 +318,7 @@ def render_calendar_content(botao_avanca, botao_volta, pathname):
             day = "SEG" if days_of_week.index(day) + 1 >= 7 else days_of_week[days_of_week.index(day) + 1]
             if day == "SEG": 
                 c += 1
+        
 
         return empty_dict, meses[mm-1], anos[yy]
 
@@ -346,7 +348,9 @@ def toggle_modal(n1, n2, is_open):
     Output('local-input', 'value'),
     Output('descricao-input', 'value'),
 
-    Input('submit-tarefa', 'n_clicks'),
+    [Input('submit-tarefa', 'n_clicks'),
+    Input('avancar', 'n_clicks'),
+    Input('voltar', 'n_clicks')],
 
     State('div-data-concatenada', 'children'),
     State('horario-input', 'value'),
@@ -355,22 +359,32 @@ def toggle_modal(n1, n2, is_open):
     State('descricao-input', 'value'), 
     prevent_initial_call=True
     )
-def update_lista_eventos(n_clicks, data_conc, horario, titulo, local, descricao):
-    if data_conc in lista_de_eventos:
-        lista_de_eventos[data_conc].append({'horario' : horario, 'titulo' : titulo,
-                                                'local' : local, 'descricao' : descricao}
-                                                )
-    else:
-        lista_de_eventos.update({data_conc : [{'horario' : horario, 'titulo' : titulo,
-                                                'local' : local, 'descricao' : descricao}
-                                                ]
-                                })
+def update_lista_eventos(n_clicks, n2, n3, data_conc, horario, titulo, local, descricao):
+
+    changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+
+    if 'submit-tarefa' in changed_id:
+
+
+        if data_conc in lista_de_eventos:
+            lista_de_eventos[data_conc].append({'horario' : horario, 'titulo' : titulo,
+                                                    'local' : local, 'descricao' : descricao}
+                                                    )
+
+        else:
+            lista_de_eventos.update({data_conc : [{'horario' : horario, 'titulo' : titulo,
+                                                    'local' : local, 'descricao' : descricao}
+                                                    ]
+                                    })
+
     horario = None
     titulo = None
     local = None
     descricao = None
 
     return lista_de_eventos, horario, titulo, local, descricao
+
+
 
 @app.callback(
     [Output('div-data-concatenada', 'children'),
@@ -399,8 +413,15 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
 
     card_tarefa = []
 
+
     num_events = 0 if data_conc not in lista_de_eventos.keys() else len(lista_de_eventos[data_conc])
 
+
+    if num_events != 0:
+        newlist = sorted(lista_de_eventos[data_conc], key=lambda d: d['horario']) 
+
+    lis = [1, 2, 5, 7]
+    len(lis)
 
     col = active_cell['column_id']
 
@@ -428,7 +449,7 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                     dbc.Row(
                         [
                             dbc.Col(
-                                html.H4(lista_de_eventos[data_conc][i]['horario'],
+                                html.H4(newlist[i]['horario'],
                                 style={'font-weight' : 'bold',
                                         'text-align' : 'center',
                                         'font-size' : '16px'}),
@@ -436,15 +457,15 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                             dbc.Col(
                                 dbc.CardBody(
                                     [
-                                        html.H4(lista_de_eventos[data_conc][i]['titulo'],
+                                        html.H4(newlist[i]['titulo'],
                                         style={'font-weight' : 'bold',
                                                 'margin-top' : '-10px',
                                                 'font-size' : '16px'}),
-                                        html.P(lista_de_eventos[data_conc][i]['local'],
+                                        html.P(newlist[i]['local'],
                                         style={'margin-top' : '-4px',
                                                 'font-size' : '12px',
                                                 'color' : 'gray'}),
-                                        html.P(lista_de_eventos[data_conc][i]['descricao'])
+                                        html.P(newlist[i]['descricao'])
                                     ]
                                 ),
                                 className="col-md-9",
@@ -474,7 +495,7 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                 id='card-tarefa'
                 )
         card_tarefa.append(new_card)
-
+        
     return data_conc, card_tarefa, data_extenso
 
 
