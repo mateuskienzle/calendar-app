@@ -36,8 +36,7 @@ mm = 0
 yy = (year - 2000)
 
 #variavel global que retorna o dia atual em formato de string
-dd = datetime.datetime.today().day
-dia_string = str(dd)
+dia_atual = datetime.datetime.today().day
 
 #função que retorna o dia da semana em que está localizado o primeiro
 #dia do mês e também retorna o útlimo dia do mês
@@ -59,8 +58,6 @@ def get_calendar(yy, mm):
     last_day = int(calendar_[-1].split(" ")[-1])
     
     return first_day, last_day
-
-#variavel global que controla o número de eventos por data
 
 
 #estrutura da tabela do calendário
@@ -146,7 +143,6 @@ app.layout = dbc.Container([
     #exibição da estrutura da tabela do calendário
     html.Div([
         DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], id="calendar",
-        active_cell = {'row': 3, 'column' : 4, 'column_id' : 'SEX', 'row_id' : 0},
         style_table={'borderRadius' : '20px',
                     'border': '2px solid #000000',
                     'height': '40rem',
@@ -275,6 +271,7 @@ app.layout = dbc.Container([
 
 @app.callback(
     Output('calendar', 'data'),
+    Output('calendar', 'active_cell'),
     Output('div-mes', 'children'),
     Output('div-ano', 'children'),
 
@@ -314,13 +311,18 @@ def render_calendar_content(botao_avanca, botao_volta, pathname):
         days_of_week = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM']
         c = 0
         for d in range(1, last_day+1):
-            empty_dict[c][day] = d        
+            empty_dict[c][day] = d
+
+            if d == dia_atual:
+                initial_active_cell = {'row': c, 'column' : (days_of_week.index(day)), 'column_id' : day, 'row_id' : c}
+
             day = "SEG" if days_of_week.index(day) + 1 >= 7 else days_of_week[days_of_week.index(day) + 1]
+
+
             if day == "SEG": 
                 c += 1
-        
 
-        return empty_dict, meses[mm-1], anos[yy]
+        return empty_dict, initial_active_cell, meses[mm-1], anos[yy]
 
 
 @app.callback(
@@ -336,9 +338,6 @@ def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
     return is_open
-
-
-
 
 
 @app.callback(
@@ -418,10 +417,8 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
 
 
     if num_events != 0:
-        newlist = sorted(lista_de_eventos[data_conc], key=lambda d: d['horario']) 
+        lista_ordenada_de_eventos = sorted(lista_de_eventos[data_conc], key=lambda d: d['horario']) 
 
-    lis = [1, 2, 5, 7]
-    len(lis)
 
     col = active_cell['column_id']
 
@@ -449,7 +446,7 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                     dbc.Row(
                         [
                             dbc.Col(
-                                html.H4(newlist[i]['horario'],
+                                html.H4(lista_ordenada_de_eventos[i]['horario'],
                                 style={'font-weight' : 'bold',
                                         'text-align' : 'center',
                                         'font-size' : '16px'}),
@@ -457,15 +454,15 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                             dbc.Col(
                                 dbc.CardBody(
                                     [
-                                        html.H4(newlist[i]['titulo'],
+                                        html.H4(lista_ordenada_de_eventos[i]['titulo'],
                                         style={'font-weight' : 'bold',
                                                 'margin-top' : '-10px',
                                                 'font-size' : '16px'}),
-                                        html.P(newlist[i]['local'],
+                                        html.P(lista_ordenada_de_eventos[i]['local'],
                                         style={'margin-top' : '-4px',
                                                 'font-size' : '12px',
                                                 'color' : 'gray'}),
-                                        html.P(newlist[i]['descricao'])
+                                        html.P(lista_ordenada_de_eventos[i]['descricao'])
                                     ]
                                 ),
                                 className="col-md-9",
