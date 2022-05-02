@@ -2,18 +2,18 @@ from this import d
 from dash import Dash, Input, Output, dash_table, callback_context
 from dash import html, dcc
 import dash
-import idna
-from matplotlib.pyplot import text
 import pandas as pd
 import pdb 
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, MATCH, ALL
 import datetime
 
 # from app import app
 from app import *
 import calendar
 from dash_table import DataTable
+import json
+import os
 
 
 #lista dos meses do ano
@@ -72,15 +72,29 @@ df = pd.DataFrame({
             })
 
 
-lista_de_eventos = {}
+
+def save_file(lista_eventos):
+    with open('eventos.json', 'w') as f:
+        json.dump(lista_eventos, f)
+
+if "eventos.json" in os.listdir():
+    lista_de_eventos = json.load(open('eventos.json'))
+else:
+    lista_de_eventos = {'29/04/2022': 
+                [
+                    {'horario': '14:00', 'titulo': 'aula', 'local': 'faculdade', 'descricao': 'quimica', 'id': 0},
+                    {'horario': '16:00', 'titulo': 'aula2', 'local': 'faculdade', 'descricao': 'fisica', 'id': 1},
+                    {'horario': '20:00', 'titulo': 'aula3', 'local': 'faculdade', 'descricao': 'quimica', 'id': 2},
+                ],
+                'id_max': 3
+            }
+    save_file(lista_de_eventos)
 
 
 #container princiapal, em que tudo mostrado na página está dentro dele
 app.layout = dbc.Container([
-
-
     #botão para voltar para o mês anterior
-    
+
     dbc.Button('>',id='avancar', n_clicks=0, 
                 style={'color' : 'black',
                 'background-color': '#ffffff',
@@ -162,7 +176,7 @@ app.layout = dbc.Container([
     ),
 
     #botão que abre a janela de insersação dos dados das tarefas 
-    dbc.Button("Adicionar tarefa", color="light", className="me-1", id='add-tarefa-button', n_clicks=0,
+    dbc.Button("Adicionar tarefa", color="light", className="me-1", id='open-modal-button', n_clicks=0,
                 style={'margin-top' : '5px',
                 'margin-left' : '56.5rem',
                 'font-weight': 'bold'
@@ -190,7 +204,7 @@ app.layout = dbc.Container([
 
             dbc.ModalBody([
 
-                dcc.Input(id="horario-input", placeholder="Horário", type="text", 
+                dcc.Input(id="horario-input", placeholder="Horário", type="text",
                         style={'width' : '62px',
                                 'margin-top' : '20px'}
                         ),
@@ -204,6 +218,12 @@ app.layout = dbc.Container([
                         style={'width' : '450px',
                                 'margin-top' : '20px'}
                                 ),
+                
+                html.Div(id="required-field-notification", 
+                        style={'width' : '450px',
+                                'margin-top' : '20px',
+                                'color' : 'red'}
+                                ),
 
                 html.Button('Salvar', id='submit-tarefa', n_clicks=0, 
                             style={'color' : 'rgba(0, 0, 0, 1.0)',
@@ -215,7 +235,8 @@ app.layout = dbc.Container([
 
     ],style={'color' : '#000000',
         'background-color' : 'rgba(255, 255, 255, 0.4)'},
-        id="modal-tarefa"
+        id="modal-tarefa",
+        is_open=False
     ),
 
     html.Div(id='div-dia-semana-atual',
@@ -232,11 +253,11 @@ app.layout = dbc.Container([
             'margin-top' : '-20px', 
             'width' : '80px',
             'height' : '20px',
-            'color' : '#ffffff',
+            'color' : 'transparent',
             'text-align' : 'left'}
         ),
 
-    dcc.Store(id='div-armazena-dados-cards', data=lista_de_eventos),
+    dcc.Store(id='storage-lista-de-eventos', data=lista_de_eventos),
 
     html.Div(id='div-armazena-numero-de-eventos'),
 
@@ -312,12 +333,15 @@ def render_calendar_content(botao_avanca, botao_volta, pathname):
         c = 0
         for d in range(1, last_day+1):
             empty_dict[c][day] = d
-
-            if d == dia_atual:
+            
+            if d == dia_atual and meses[month-1] == meses[mm-1] and year == anos[yy]:
                 initial_active_cell = {'row': c, 'column' : (days_of_week.index(day)), 'column_id' : day, 'row_id' : c}
+            
+            elif meses[month-1] != meses[mm-1] or year != anos[yy]:
+                if d == 1:
+                    initial_active_cell = {'row': c, 'column' : (days_of_week.index(day)), 'column_id' : day, 'row_id' : c}
 
             day = "SEG" if days_of_week.index(day) + 1 >= 7 else days_of_week[days_of_week.index(day) + 1]
-
 
             if day == "SEG": 
                 c += 1
@@ -328,60 +352,80 @@ def render_calendar_content(botao_avanca, botao_volta, pathname):
 @app.callback(
         Output('modal-tarefa', 'is_open'),
 
-        Input('add-tarefa-button', 'n_clicks'),
+        Input('open-modal-button', 'n_clicks'),
         Input('submit-tarefa', 'n_clicks'),
 
         State('modal-tarefa', 'is_open'),
+        State('horario-input', 'value'),
         prevent_initial_call=True
         )
-def toggle_modal(n1, n2, is_open):
-    if n1 or n2:
+def toggle_modal(n1, n2, is_open, horario):
+    changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+
+    if changed_id.split('.')[0] == 'open-modal-button':
+        return not is_open
+
+    if changed_id.split('.')[0] == 'submit-tarefa' and horario:
         return not is_open
     return is_open
 
 
+
 @app.callback(
-    Output('div-armazena-dados-cards', 'data'),
+    [
+    Output('storage-lista-de-eventos', 'data'),
     Output('horario-input', 'value'),
     Output('titulo-input', 'value'),
     Output('local-input', 'value'),
     Output('descricao-input', 'value'),
+    Output('required-field-notification', 'children')
+    ],
 
-    [Input('submit-tarefa', 'n_clicks'),
+    [
+    Input('submit-tarefa', 'n_clicks'),
+    Input({'type': 'delete_event', 'index': ALL}, 'n_clicks'),
     Input('avancar', 'n_clicks'),
-    Input('voltar', 'n_clicks')],
+    Input('voltar', 'n_clicks')
+    ],
 
+    [
     State('div-data-concatenada', 'children'),
     State('horario-input', 'value'),
     State('titulo-input', 'value'),
     State('local-input', 'value'),
-    State('descricao-input', 'value'), 
+    State('descricao-input', 'value')
+    ], 
     prevent_initial_call=True
     )
-def update_lista_eventos(n_clicks, n2, n3, data_conc, horario, titulo, local, descricao):
-
+def update_lista_eventos(n_clicks, n_clicks2, n2, n3, data_conc, horario, titulo, local, descricao):
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
     if 'submit-tarefa' in changed_id:
-
-
-        if data_conc in lista_de_eventos:
-            lista_de_eventos[data_conc].append({'horario' : horario, 'titulo' : titulo,
-                                                    'local' : local, 'descricao' : descricao}
-                                                    )
+        if not horario:
+            notificacao = 'Insira um horário válido'
+            return lista_de_eventos, horario, titulo, local, descricao, notificacao
 
         else:
-            lista_de_eventos.update({data_conc : [{'horario' : horario, 'titulo' : titulo,
-                                                    'local' : local, 'descricao' : descricao}
-                                                    ]
-                                    })
+            if data_conc not in lista_de_eventos:
+                lista_de_eventos[data_conc] = []
+            lista_de_eventos[data_conc].append({'horario' : horario, 'titulo' : titulo,
+                                                    'local' : local, 'descricao' : descricao,
+                                                    'id' : lista_de_eventos['id_max']}
+                                                        )
+            lista_de_eventos['id_max'] += 1
+    
+    if 'delete_event' in changed_id and any(n_clicks2):
+        dict_id = json.loads(changed_id.split(".")[0])
+        idx = dict_id["index"]
+        lista_de_eventos[data_conc] = [i for i in lista_de_eventos[data_conc] if i["id"] != idx]
 
     horario = None
     titulo = None
     local = None
     descricao = None
+    notificacao = ''
 
-    return lista_de_eventos, horario, titulo, local, descricao
+    return lista_de_eventos, horario, titulo, local, descricao, notificacao
 
 
 
@@ -391,8 +435,10 @@ def update_lista_eventos(n_clicks, n2, n3, data_conc, horario, titulo, local, de
     Output('div-dia-semana-atual', 'children')
     ],
 
-    [Input('calendar', 'active_cell'),
-    Input('div-armazena-dados-cards', 'data'),],
+    [
+    Input('calendar', 'active_cell'),
+    Input('storage-lista-de-eventos', 'data')
+    ],
 
     [
     State('div-mes', 'children'),
@@ -403,13 +449,14 @@ def update_lista_eventos(n_clicks, n2, n3, data_conc, horario, titulo, local, de
     prevent_initial_call=True
     )
 def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
+    save_file(lista_de_eventos)
+    
     dia = calendar_data[active_cell['row']][active_cell['column_id']]
 
     if dia == None:
         dia = 1
 
     data_conc = '{:02d}/{:02d}/{:02d}'.format(dia, meses.index(str(mes)) + 1, ano)
-
     card_tarefa = []
 
 
@@ -468,7 +515,12 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                                 className="col-md-9",
                             ),
                             dbc.Col(
-                                dbc.Button('X', id='limpa-tarefa', n_clicks=0, 
+                                dbc.Button('X', 
+                                        # id='limpa-tarefa',
+                                        id={
+                                            'type': 'delete_event',
+                                            'index': lista_ordenada_de_eventos[i]['id']
+                                        },     
                                         style={'color' : 'black',
                                         'background-color': '#ffffff',
                                         'border' : '1px solid black',
@@ -492,11 +544,10 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                 id='card-tarefa'
                 )
         card_tarefa.append(new_card)
-        
+
     return data_conc, card_tarefa, data_extenso
 
 
 
 if __name__ == "__main__":
     app.run_server(debug=True)
-
