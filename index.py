@@ -139,9 +139,9 @@ app.layout = dbc.Container([
                         'margin-top' : '45px', 
                         'font-weight': 'bold',
                         'font-size' : '40px',
-                        'background-color' : 'transparent',
-                        'color' : '#ffffff'},
-                        id='div-ano'),
+                        'background-color' : 'transparent'},
+                        id='div-ano',
+                        className='primary-font-color')
                     ]), 
                     
                     dbc.Row([
@@ -152,9 +152,9 @@ app.layout = dbc.Container([
                         'margin-top' : '0px',
                         'font-weight': 'bold',
                         'font-size' : '26px',
-                        'background-color' : 'transparent',
-                        'color' : 'rgba(236, 100, 75, 1)'},
-                        id='div-mes'),
+                        'background-color' : 'transparent'},
+                        id='div-mes',
+                        className ='secundary-font-color')
 
                     ]),
 
@@ -163,7 +163,6 @@ app.layout = dbc.Container([
                         style_table={'border': '2px solid transparent',
                                     'height': '390px',
                                     'width' : '715px',
-                                    'color' : '#ffffff',
                                     'margin-top' : '20px',
                                     'margin-left' : '30px'},
                         style_cell={'height': '5.5rem'},
@@ -175,10 +174,10 @@ app.layout = dbc.Container([
                                         'backgroundColor': 'transparent', 
                                         'textAlign' : 'center', 
                                         'font-weight': 'bold'},
-
                         )
-                    ]),
-                ], md=12, style={'margin-left' : '7.5px', 'margin-top' : '35px'},  className = 'primary-color'),
+                    ], className='primary-font-color'),
+                ], md=12, style={'margin-left' : '7.5px', 'margin-top' : '35px', 'border-top-left-radius': '2%',
+                                    'border-bottom-left-radius' : '2%'},  className = 'primary-color'),
             ], md=7, style={ 'height' : '100vh'}, className = 'terciary-color'),
 
             dbc.Col([
@@ -189,41 +188,48 @@ app.layout = dbc.Container([
                                 'margin-top' : '20px', 
                                 'width' : 'fit-content',
                                 'height' : 'fit-content',
-                                'color' : '#ffffff',
                                 'font-size': '150px',
                                 'line-height': '0.85',
-                                'background-color' : 'transparent'}
+                                'background-color' : 'transparent'},
+                                className='primary-font-color'
                         ),
 
                         html.Div(id='div-dia-semana-atual',
                                 style={'margin-left' : '172px',
-                                'margin-top' : '-50px', 
+                                'margin-top' : '-30px', 
                                 'width' : '140px',
                                 'height' : '30px',
-                                'color' : '#ffffff',
-                                'text-align': 'top',
                                 'font-size': '20px',
-                                'background-color' : 'transparente'}
+                                'background-color' : 'transparente'},
+                                className='primary-font-color'
                         ),
                     ], md=8, className = 'secundary-color'),
 
                     dbc.Col([
+
+                        html.Div("Adicionar nova tarefa",
+                                style={'margin-left' : '20px',
+                                'margin-top' : '48px', 
+                                'width' : '80px',
+                                'height' : '50px',
+                                'text-align' : 'left'},
+                                className='primary-font-color'
+                        ),
+
                         #botão que abre a janela de insersação dos dados das tarefas 
-                        dbc.Button("Adicionar tarefa", color="light", className="me-1", id='open-modal-button', n_clicks=0,
-                                    style={'margin-top' : '40px',
-                                    'margin-left' : '30px',
-                                    'width' : '120px',
-                                    'font-weight': 'bold',
-                                    }),
+                        dbc.Button([html.I(className = "fa fa-plus", style={'font-size' : '400%'})],
+                                    id='open-modal-button',
+                                    style={'width' : '40px',
+                                            'height' : '40px',
+                                            'margin-top' : '-77px',
+                                            'margin-left' : '120px',
+                                            'border-radius' : '50%'},
+                                    className='terciary-color'
+                        ),
+
 
                         html.Div(id='div-data-concatenada',
-                                style={'margin-left' : '90px',
-                                'margin-top' : '60px', 
-                                'width' : '80px',
-                                'height' : '30px',
-                                'color' : 'transparent',
-                                'background-color' : 'transparent',
-                                'text-align' : 'left'}
+                                hidden=True
                         ),
                     ], md=4, className = 'secundary-color', style={ 'border-top-right-radius' : '7%'}),
                 ], style={'margin-top' : '35px', 'width' : '550px'}),
@@ -237,23 +243,23 @@ app.layout = dbc.Container([
                     dbc.Card(style = {'color' : '#000000',
                         'border-radius' : '0px',
                         'width' : '550px',
-                        'height' : '393px',
+                        'height' : '413px',
                         'margin-left' : '0px',
                         'margin-top' : '0px',
                         'background-color': 'rgba(0,0,0)',
-                        'overflow-y': 'scroll'},
+                        'border-bottom-right-radius' : '2%'},
                         id='card-geral'
                     ),
                 ]),
             ], md=5, className = 'terciary-color'),
         ]), 
 
-        #janela de insersação dos dados das tarefas 
+            #janela de insersação dos dados das tarefas 
             dbc.Modal([
-                dbc.ModalHeader("Nova tarefa"),
+                dbc.ModalHeader("Nova tarefa", style={'color' : '#ffffff', 'font-size' : '20px'}, className = 'modal-color'),
 
                 dbc.ModalTitle(
-                    dcc.Input(id="titulo-input", 
+                    dbc.Input(id="titulo-input", 
                                         placeholder="Adicione um título", type="text", 
                                         style={'width' : '400px',
                                                 'border-top' : 'transparent',
@@ -263,41 +269,50 @@ app.layout = dbc.Container([
                                                 'border-radius' : '0px',
                                                 'margin-left' : '10px',
                                                 'font-weight': 'bold',
-                                                'margin-top' : '20px'
-                                                }
-                    )
+                                                'margin-top' : '20px',
+                                                },
+                                        className='input-modal-color'
+                                        
+                    ), className = 'modal-color'
                 ),
 
                 dbc.ModalBody([
 
-                    dcc.Input(id="horario-input", placeholder="Horário", type="text",
-                            style={'width' : '62px',
-                                    'margin-top' : '20px'}
+                    dbc.Input(id="horario-input", placeholder="Horário", type="text",
+                            style={'width' : '76px',
+                                    'margin-top' : '20px',
+                                    'border' : '1px solid black'},
+                            className='input-modal-color',
+                            maxlength=7
                     ),
 
-                    dcc.Input(id="local-input", placeholder="Local", type="text", 
+                    dbc.Input(id="local-input", placeholder="Local", type="text", 
                             style={'width' : '450px',
-                                    'margin-top' : '20px'}
+                                    'margin-top' : '20px',
+                                    'border' : '1px solid black'},
+                            className='input-modal-color'
                     ),
 
-                    dcc.Input(id="descricao-input", placeholder="Descrição", type="text", 
+                    dbc.Input(id="descricao-input", placeholder="Descrição", type="text", 
                             style={'width' : '450px',
-                                    'margin-top' : '20px'}
+                                    'margin-top' : '20px',
+                                    'border' : '1px solid black'},
+                            className='input-modal-color'
                     ),
                     
                     html.Div(id="required-field-notification", 
                             style={'width' : '450px',
-                                    'margin-top' : '20px',
-                                    'color' : 'red'}
+                                    'margin-top' : '20px'},
+                            className ='secundary-font-color'
                     ),
 
-                    html.Button('Salvar', id='submit-tarefa', n_clicks=0, 
-                                style={'color' : 'rgba(0, 0, 0, 1.0)',
-                                        'background-color': 'rgba(128, 128, 128, 0.5)',
-                                        'margin-top' : '20px',
-                                        'margin-left' : '390px'}
+                    dbc.Button('Salvar', color="light", className="me-1", id='submit-tarefa', n_clicks=0, 
+                                style={'margin-top' : '15px',
+                                        'margin-left' : '390px',
+                                        'font-weight': 'bold',
+                                        'font-size' : '16px',}
                     )
-                ]),
+                ], className = 'modal-color'),
 
                 ],style={'color' : '#000000',
                     'background-color' : 'rgba(255, 255, 255, 0.4)'},
@@ -370,15 +385,15 @@ def render_calendar_content(botao_avanca, botao_volta, pathname):
 
 
 @app.callback(
-        Output('modal-tarefa', 'is_open'),
+    Output('modal-tarefa', 'is_open'),
 
-        Input('open-modal-button', 'n_clicks'),
-        Input('submit-tarefa', 'n_clicks'),
+    Input('open-modal-button', 'n_clicks'),
+    Input('submit-tarefa', 'n_clicks'),
 
-        State('modal-tarefa', 'is_open'),
-        State('horario-input', 'value'),
-        prevent_initial_call=True
-        )
+    State('modal-tarefa', 'is_open'),
+    State('horario-input', 'value'),
+    prevent_initial_call=True
+    )
 def toggle_modal(n1, n2, is_open, horario):
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
@@ -470,6 +485,7 @@ def update_lista_eventos(n_clicks, n_clicks2, n2, n3, data_conc, horario, titulo
     prevent_initial_call=True
     )
 def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
+
     save_file(lista_de_eventos)
     
     dia = calendar_data[active_cell['row']][active_cell['column_id']]
@@ -508,62 +524,71 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
     dia_mês_atual = data_conc[:2] 
     dia_semana_atual = col
 
+    if num_events == 0:
+        card_tarefa = dbc.Card(
+            [
+                dbc.Row(
+                    [
+                    html.H3('Não há eventos nessa data')
+                    ],
+                    className="g-0 d-flex align-items-center",
+                    style={'margin-top' : '45px'}
+                )
+            ],
+            className="mb-3",
+            style={"maxWidth": "540px",
+                    'background-color' : '#000000'},
+            id='card-tarefa'
+        )
 
     for i in range(num_events):
+        
         new_card = dbc.Card(
-                [
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                html.H4(lista_ordenada_de_eventos[i]['horario'],
-                                style={'font-weight' : 'bold',
-                                        'text-align' : 'center',
-                                        'font-size' : '16px'}),
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            html.H4(lista_ordenada_de_eventos[i]['horario'],
+                            style={'font-weight' : 'bold',
+                                    'text-align' : 'center',
+                                    'font-size' : '16px'}),
+                        ),
+                        dbc.Col(
+                            dbc.CardBody(
+                                [
+                                    html.H4(lista_ordenada_de_eventos[i]['titulo'],
+                                    style={'font-weight' : 'bold',
+                                            'margin-top' : '-10px',
+                                            'font-size' : '16px'}),
+                                    html.P(lista_ordenada_de_eventos[i]['local'],
+                                    style={'margin-top' : '-4px',
+                                            'font-size' : '12px',
+                                            'color' : 'gray'}),
+                                    html.P(lista_ordenada_de_eventos[i]['descricao'])
+                                ]
                             ),
-                            dbc.Col(
-                                dbc.CardBody(
-                                    [
-                                        html.H4(lista_ordenada_de_eventos[i]['titulo'],
-                                        style={'font-weight' : 'bold',
-                                                'margin-top' : '-10px',
-                                                'font-size' : '16px'}),
-                                        html.P(lista_ordenada_de_eventos[i]['local'],
-                                        style={'margin-top' : '-4px',
-                                                'font-size' : '12px',
-                                                'color' : 'gray'}),
-                                        html.P(lista_ordenada_de_eventos[i]['descricao'])
-                                    ]
-                                ),
-                                className="col-md-9",
-                            ),
-                            dbc.Col(
-                                dbc.Button('X', 
-                                        id={
-                                            'type': 'delete_event',
-                                            'index': lista_ordenada_de_eventos[i]['id']
-                                        },     
-                                        style={'color' : 'black',
-                                        'background-color': '#ffffff',
-                                        'border' : '1px solid black',
-                                        'border-radius' : '50%',
-                                        'width' : '20px',
-                                        'height' : '20px',
-                                        'font-weight': 'bold',
-                                        'font-size' : '12px',
-                                        'padding' : '0px 6px'
-                                        }),
-                                className="col-md-1",
-                            )
-                        ],
-                        className="g-0 d-flex align-items-center",
-                        style={'border-bottom': '1px solid white',}
-                    )
-                ],
-                className="mb-3",
-                style={"maxWidth": "540px",
-                        'background-color' : '#000000'},
-                id='card-tarefa'
+                            className="col-md-9",
+                        ),
+                        dbc.Col(
+                            dbc.Button([html.I(className = "fa fa-trash", 
+                                                style={'font-size' : '200%'})],
+                                    id={
+                                        'type': 'delete_event',
+                                        'index': lista_ordenada_de_eventos[i]['id']
+                                    }     
+                            ), 
+                            className="col-md-1",
+                        )
+                    ],
+                    className="g-0 d-flex align-items-center",
+                    style={'border-bottom': '1px solid white',}
                 )
+            ],
+            className="mb-3",
+            style={"maxWidth": "540px",
+                    'background-color' : '#000000'},
+            id='card-tarefa'
+        )
         card_tarefa.append(new_card)
 
     return data_conc, card_tarefa, dia_mês_atual, dia_semana_atual
