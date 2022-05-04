@@ -93,199 +93,219 @@ else:
 
 #container princiapal, em que tudo mostrado na página está dentro dele
 app.layout = dbc.Container([
-    #botão para voltar para o mês anterior
-
-    dbc.Button('>',id='avancar', n_clicks=0, 
-                style={'color' : 'black',
-                'background-color': '#ffffff',
-                'border' : '1px solid black',
-                'border-radius' : '50%',
-                'width' : '35px',
-                'height' : '35px',
-                'margin-top' : '10px',
-                'margin-left' : '66.5rem',
-                'font-weight': 'bold',
-                'font-size' : '20px',
-                'padding' : '0px 12px'
-                }),
-                
-
-    #botão para avançar para o mês seguinte
-    dbc.Button('<', id='voltar', n_clicks=0, 
-                style={'color' : 'black',
-                'background-color': '#ffffff',
-                'border' : '1px solid black',
-                'border-radius' : '50%',
-                'width' : '35px',
-                'height' : '35px',
-                'margin-top' : '10px',
-                'margin-left' : '-69rem',
-                'font-weight': 'bold',
-                'font-size' : '20px',
-                'padding' : '0px 0px'
-                }),
-    
 
         dcc.Location(id="url"),
 
-        #seção em que é exibido o ano
-        html.Div('Ano', 
-        style={'margin-left' : '31.5rem', 
-        'width' : '73px',
-        'textAlign': 'center',
-        'margin-top' : '-30px', 
-        'font-weight': 'bold',
-        'font-size' : '16px',
-        'color' : '#ffffff'},
-        id='div-ano'),
+        dbc.Row([
+            dbc.Col([
+                dbc.Col([
+                    dbc.Row([
+                        #botão para avançar para o mês seguinte
+                        dbc.Button('<', id='voltar', n_clicks=0, 
+                        style={'color' : 'black',
+                        'background-color': '#ffffff',
+                        'border' : '1px solid black',
+                        'border-radius' : '50%',
+                        'width' : '35px',
+                        'height' : '35px',
+                        'margin-top' : '60px',
+                        'margin-left' : '280px',
+                        'font-weight': 'bold',
+                        'font-size' : '20px',
+                        'padding' : '0px 0px'
+                        }),
 
+                        #botão para voltar para o mês anterior
+                        dbc.Button('>',id='avancar', n_clicks=0, 
+                        style={'color' : 'black',
+                        'background-color': '#ffffff',
+                        'border' : '1px solid black',
+                        'border-radius' : '50%',
+                        'width' : '35px',
+                        'height' : '35px',
+                        'margin-top' : '60px',
+                        'margin-left' : '160px',
+                        'font-weight': 'bold',
+                        'font-size' : '20px',
+                        'padding' : '0px 12px'
+                        }),
 
-        #seção em que é exibido o mês
-        html.Div('Mês',
-        style={'margin-left' : '29rem',
-        'width' : '130px',
-        'textAlign': 'center',
-        'margin-top' : '20px',
-        'margin-bottom' : '-15px',
-        'font-weight': 'bold',
-        'font-size' : '26px',
-        'color' : 'rgba(236, 100, 75, 1)'},
-        id='div-mes'),
+                        #seção em que é exibido o ano
+                        html.Div('Ano', 
+                        style={'width' : 'fit-content',
+                        'padding' : '0px',
+                        'textAlign': 'center',
+                        'margin-left' : '-160px', 
+                        'margin-top' : '45px', 
+                        'font-weight': 'bold',
+                        'font-size' : '40px',
+                        'background-color' : 'transparent',
+                        'color' : '#ffffff'},
+                        id='div-ano'),
+                    ]), 
+                    
+                    dbc.Row([
+                        html.Div('Mês',
+                        style={'width' : '130px',
+                        'textAlign': 'center',
+                        'margin-left' : '330px',
+                        'margin-top' : '0px',
+                        'font-weight': 'bold',
+                        'font-size' : '26px',
+                        'background-color' : 'transparent',
+                        'color' : 'rgba(236, 100, 75, 1)'},
+                        id='div-mes'),
 
+                    ]),
 
-
-    #exibição da estrutura da tabela do calendário
-    html.Div([
-        DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], id="calendar",
-        style_table={'borderRadius' : '20px',
-                    'border': '2px solid #000000',
-                    'height': '40rem',
-                    'width' : '70rem',
-                    'margin-top' : '2rem',
-                    'color' : '#ffffff'},
-        style_cell={'height': '5.5rem'},
-        style_data={'border': '0px',  
-                    'backgroundColor': 'transparent', 
-                    'textAlign' : 'center'},
-        style_header={'border': '0px', 
-                        'backgroundColor': 'transparent', 
-                        'textAlign' : 'center', 
-                        'font-weight': 'bold'},
-
-        )]
-    ),
-
-    #botão que abre a janela de insersação dos dados das tarefas 
-    dbc.Button("Adicionar tarefa", color="light", className="me-1", id='open-modal-button', n_clicks=0,
-                style={'margin-top' : '5px',
-                'margin-left' : '56.5rem',
-                'font-weight': 'bold'
-                }),
-
-    #janela de insersação dos dados das tarefas 
-    dbc.Modal([
-            dbc.ModalHeader("Nova tarefa"),
-
-            dbc.ModalTitle(
-                dcc.Input(id="titulo-input", 
-                                    placeholder="Adicione um título", type="text", 
-                                    style={'width' : '400px',
-                                            'border-top' : 'transparent',
-                                            'border-left' : 'transparent',
-                                            'border-right' : 'transparent',
-                                            'border-bottom' : '2px solid black',
-                                            'border-radius' : '0px',
-                                            'margin-left' : '10px',
-                                            'font-weight': 'bold',
-                                            'margin-top' : '20px'
-                                            }
-                                    )
-                        ),
-
-            dbc.ModalBody([
-
-                dcc.Input(id="horario-input", placeholder="Horário", type="text",
-                        style={'width' : '62px',
-                                'margin-top' : '20px'}
-                        ),
-
-                dcc.Input(id="local-input", placeholder="Local", type="text", 
-                        style={'width' : '450px',
-                                'margin-top' : '20px'}
-                                ),
-
-                dcc.Input(id="descricao-input", placeholder="Descrição", type="text", 
-                        style={'width' : '450px',
-                                'margin-top' : '20px'}
-                                ),
-                
-                html.Div(id="required-field-notification", 
-                        style={'width' : '450px',
-                                'margin-top' : '20px',
-                                'color' : 'red'}
-                                ),
-
-                html.Button('Salvar', id='submit-tarefa', n_clicks=0, 
-                            style={'color' : 'rgba(0, 0, 0, 1.0)',
-                                    'background-color': 'rgba(128, 128, 128, 0.5)',
+                    dbc.Row([
+                        DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], id="calendar",
+                        style_table={'border': '2px solid transparent',
+                                    'height': '390px',
+                                    'width' : '715px',
+                                    'color' : '#ffffff',
                                     'margin-top' : '20px',
-                                    'margin-left' : '390px'})
+                                    'margin-left' : '30px'},
+                        style_cell={'height': '5.5rem'},
+                        style_data={'border': '0px',  
+                                    'backgroundColor': 'transparent', 
+                                    'textAlign' : 'center'},
+                        style_header={'border': '0px', 
+                                        'color' : 'rgba(255,255,255, 0.4)',
+                                        'backgroundColor': 'transparent', 
+                                        'textAlign' : 'center', 
+                                        'font-weight': 'bold'},
 
-            ]),
+                        )
+                    ]),
+                ], md=12, style={'margin-left' : '7.5px', 'margin-top' : '35px'},  className = 'primary-color'),
+            ], md=7, style={ 'height' : '100vh'}, className = 'terciary-color'),
 
-    ],style={'color' : '#000000',
-        'background-color' : 'rgba(255, 255, 255, 0.4)'},
-        id="modal-tarefa",
-        is_open=False
-    ),
+            dbc.Col([
+                dbc.Row([
+                    dbc.Col([
+                        html.Div(id='div-dia-mês-atual',
+                                style={'margin-left' : '0px',
+                                'margin-top' : '20px', 
+                                'width' : 'fit-content',
+                                'height' : 'fit-content',
+                                'color' : '#ffffff',
+                                'font-size': '150px',
+                                'line-height': '0.85',
+                                'background-color' : 'transparent'}
+                        ),
 
-    html.Div(id='div-dia-semana-atual',
-            style={'margin-left' : '802px',
-            'margin-top' : '-510px', 
-            'width' : '130px',
-            'height' : '20px',
-            'color' : '#ffffff',
-            'text-align' : 'left'}
-        ),
+                        html.Div(id='div-dia-semana-atual',
+                                style={'margin-left' : '172px',
+                                'margin-top' : '-50px', 
+                                'width' : '140px',
+                                'height' : '30px',
+                                'color' : '#ffffff',
+                                'text-align': 'top',
+                                'font-size': '20px',
+                                'background-color' : 'transparente'}
+                        ),
+                    ], md=8, className = 'secundary-color'),
 
-    html.Div(id='div-data-concatenada',
-            style={'margin-left' : '1010px',
-            'margin-top' : '-20px', 
-            'width' : '80px',
-            'height' : '20px',
-            'color' : 'transparent',
-            'text-align' : 'left'}
-        ),
+                    dbc.Col([
+                        #botão que abre a janela de insersação dos dados das tarefas 
+                        dbc.Button("Adicionar tarefa", color="light", className="me-1", id='open-modal-button', n_clicks=0,
+                                    style={'margin-top' : '40px',
+                                    'margin-left' : '30px',
+                                    'width' : '120px',
+                                    'font-weight': 'bold',
+                                    }),
 
-    dcc.Store(id='storage-lista-de-eventos', data=lista_de_eventos),
+                        html.Div(id='div-data-concatenada',
+                                style={'margin-left' : '90px',
+                                'margin-top' : '60px', 
+                                'width' : '80px',
+                                'height' : '30px',
+                                'color' : 'transparent',
+                                'background-color' : 'transparent',
+                                'text-align' : 'left'}
+                        ),
+                    ], md=4, className = 'secundary-color', style={ 'border-top-right-radius' : '7%'}),
+                ], style={'margin-top' : '35px', 'width' : '550px'}),
 
-    html.Div(id='div-armazena-numero-de-eventos'),
+                dcc.Store(id='storage-lista-de-eventos', data=lista_de_eventos),
 
-    html.Div('Hoje', id='div-hoje',
-        style={'margin-left' : '1165px',
-        'margin-top' : '-20px', 
-        'width' : '35px',
-        'height' : '20px',
-        'color' : '#ffffff',
-        'text-align' : 'center'}
-    ),
+                html.Div(id='div-armazena-numero-de-eventos'),
 
+                dbc.Row([
+                    #card principal que abrange todas as tarefa
+                    dbc.Card(style = {'color' : '#000000',
+                        'border-radius' : '0px',
+                        'width' : '550px',
+                        'height' : '393px',
+                        'margin-left' : '0px',
+                        'margin-top' : '0px',
+                        'background-color': 'rgba(0,0,0)',
+                        'overflow-y': 'scroll'},
+                        id='card-geral'
+                    ),
+                ]),
+            ], md=5, className = 'terciary-color'),
+        ]), 
 
-    #card principal que abrange todas as tarefa
-    dbc.Card(style = {'color' : '#000000',
-        'width' : '40rem',
-        'height' : '56rem',
-        'margin-left' : '800px',
-        'margin-top' : '5px',
-        'border-top' : '2px solid white',
-        'border-bottom' : '2px solid white',
-        'background-color': 'rgba(0,0,0)',
-        'overflow-y': 'scroll'},
-        id='card-geral'
-    ),
-    
-])
+        #janela de insersação dos dados das tarefas 
+            dbc.Modal([
+                dbc.ModalHeader("Nova tarefa"),
 
+                dbc.ModalTitle(
+                    dcc.Input(id="titulo-input", 
+                                        placeholder="Adicione um título", type="text", 
+                                        style={'width' : '400px',
+                                                'border-top' : 'transparent',
+                                                'border-left' : 'transparent',
+                                                'border-right' : 'transparent',
+                                                'border-bottom' : '2px solid black',
+                                                'border-radius' : '0px',
+                                                'margin-left' : '10px',
+                                                'font-weight': 'bold',
+                                                'margin-top' : '20px'
+                                                }
+                    )
+                ),
+
+                dbc.ModalBody([
+
+                    dcc.Input(id="horario-input", placeholder="Horário", type="text",
+                            style={'width' : '62px',
+                                    'margin-top' : '20px'}
+                    ),
+
+                    dcc.Input(id="local-input", placeholder="Local", type="text", 
+                            style={'width' : '450px',
+                                    'margin-top' : '20px'}
+                    ),
+
+                    dcc.Input(id="descricao-input", placeholder="Descrição", type="text", 
+                            style={'width' : '450px',
+                                    'margin-top' : '20px'}
+                    ),
+                    
+                    html.Div(id="required-field-notification", 
+                            style={'width' : '450px',
+                                    'margin-top' : '20px',
+                                    'color' : 'red'}
+                    ),
+
+                    html.Button('Salvar', id='submit-tarefa', n_clicks=0, 
+                                style={'color' : 'rgba(0, 0, 0, 1.0)',
+                                        'background-color': 'rgba(128, 128, 128, 0.5)',
+                                        'margin-top' : '20px',
+                                        'margin-left' : '390px'}
+                    )
+                ]),
+
+                ],style={'color' : '#000000',
+                    'background-color' : 'rgba(255, 255, 255, 0.4)'},
+                    id="modal-tarefa",
+                    is_open=False
+                ),
+
+], fluid=True)
 
 
 # =========  Layout  =========== #
@@ -432,7 +452,8 @@ def update_lista_eventos(n_clicks, n_clicks2, n2, n3, data_conc, horario, titulo
 @app.callback(
     [Output('div-data-concatenada', 'children'),
     Output('card-geral', 'children'),
-    Output('div-dia-semana-atual', 'children')
+    Output('div-dia-mês-atual', 'children'),
+    Output('div-dia-semana-atual', 'children'),
     ],
 
     [
@@ -484,7 +505,8 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
     elif col == 'DOM':
         col = 'Domingo'
 
-    data_extenso = col + ', ' + data_conc[:2]
+    dia_mês_atual = data_conc[:2] 
+    dia_semana_atual = col
 
 
     for i in range(num_events):
@@ -516,7 +538,6 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                             ),
                             dbc.Col(
                                 dbc.Button('X', 
-                                        # id='limpa-tarefa',
                                         id={
                                             'type': 'delete_event',
                                             'index': lista_ordenada_de_eventos[i]['id']
@@ -545,7 +566,7 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
                 )
         card_tarefa.append(new_card)
 
-    return data_conc, card_tarefa, data_extenso
+    return data_conc, card_tarefa, dia_mês_atual, dia_semana_atual
 
 
 

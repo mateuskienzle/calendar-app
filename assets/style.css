@@ -120,3 +120,15 @@ td.dash-cell.cell--selected.focused {
 td.dash-cell {
   border-color: transparent  !important;
 }
+
+.primary-color{
+  background-color: #303030;
+  border-top-left-radius: 2%;
+  border-bottom-left-radius: 2%;
+}
+.secundary-color{
+  background-color: #000000;
+}
+.terciary-color{
+  background-color: #999999;
+}
