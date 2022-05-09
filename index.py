@@ -596,4 +596,4 @@ def update_card_geral(active_cell, lista_de_eventos, mes, ano, calendar_data):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
